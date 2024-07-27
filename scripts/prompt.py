@@ -1,7 +1,7 @@
 import google.generativeai as genai
 import os
 
-
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 def write_api_key_to_file(key, file):
     f = open(file, "w")
@@ -22,10 +22,11 @@ def read_api_key_from_file(path_to_file : str) -> str:
 
 
 def prompt(message):
-    genai.configure(api_key=read_api_key_from_file("gemini_api_key.txt"))
+    genai.configure(api_key=read_api_key_from_file("../API keys/gemini_api_key.txt"))
 
     model = genai.GenerativeModel('gemini-1.5-flash')
 
     response = model.generate_content(message)
     
-    return response
+    return response.text
+
