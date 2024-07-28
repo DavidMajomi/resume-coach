@@ -2,3 +2,6 @@
 /venv
 
 API keys/gemini_api_key.txt
+*.pdf
+*.pyc
+/.vscode
