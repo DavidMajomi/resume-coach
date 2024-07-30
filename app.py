@@ -4,22 +4,13 @@ import multiprocessing
 from scripts.prompt import prompt
 from read_pdf import extract_text_from_pdf
 
-import smtplib 
+from redmail import gmail
 
-
-import base64
-from email.message import EmailMessage
-
-import google.auth
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 
 app = Flask(__name__)
 
 LOCK = multiprocessing.Lock()
 
-LIST_Of_FILES = []
-TOTAL_NUM_USERS = 0
 
 def output_line_to_file(key, file):
     f = open(file, "w")
@@ -36,6 +27,7 @@ def read_file_line(path_to_file : str) -> str:
         raise Exception("File does not exist")
     
     return val 
+
 
 def read_all_emails():
     f = open("../emails.txt", "r")
@@ -69,42 +61,25 @@ def append_email_to_file(val):
 
 
 
-
-
-
-
 def mail_response(response, email):
-    
 
     your_google_email = read_file_line("../gmail.txt")  # The email you setup to send the email using app password
     your_google_email_app_password = read_file_line("../gmail_password.txt")  # The app password you generated
     
+    your_google_email = your_google_email.replace('\n', '')
+    your_google_email_app_password = your_google_email_app_password.replace('\n', '')
     
-    print(email)
-    print(your_google_email)
-    print(your_google_email_app_password)
-
-    smtpserver = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-    smtpserver.ehlo()
-    smtpserver.login(your_google_email, your_google_email_app_password)
-
     
-    sent_from = your_google_email
-    sent_to = email  
-    sent_subject = "You Resume Insights"
-    
-    email_text = f"""\
-    From: {sent_from}
-    To: {sent_to}
-    Subject: {sent_subject}
+    gmail.username = your_google_email
+    gmail.password = your_google_email_app_password
 
-    {response}
-    """
-    
-    smtpserver.sendmail(sent_from, sent_to, email_text)
-
-    # Close the connection
-    smtpserver.close()
+    # Send an email
+    gmail.send(
+        subject="Your Resume Insights",
+        receivers=email,
+        text=response,
+        html=""
+    )
 
 
 
@@ -116,6 +91,9 @@ def num_users():
 @app.route('/process_uploads', methods=['GET','POST'])
 def process_uploads():
     list_of_files = read_all_emails()
+    
+    list_of_files = list(set(list_of_files))
+    
     print(list_of_files)
     if len(list_of_files) > 0:
         count = 15
