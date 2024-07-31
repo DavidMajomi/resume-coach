@@ -6,3 +6,5 @@ API keys/gemini_api_key.txt
 *.pyc
 /.vscode
 test_gmail.py
+test_redmail.py
+*.txt
