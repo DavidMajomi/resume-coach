@@ -8,3 +8,4 @@ API keys/gemini_api_key.txt
 test_gmail.py
 test_redmail.py
 *.txt
+gmail_smtp.py
